@@ -71,13 +71,19 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void EditEmployee(object parameter)
         {
-            // Otwórz okno edycji (EditEmployeeWindow) i przekaż wybranego pracownika
-            EditWindow editWindow = new EditWindow(SelectedEmployee, _employeeService);
-            bool? result = editWindow.ShowDialog();
-
-            if (result == true)
+            try
             {
-                RefreshEmployeesCollection();
+                EditWindow editWindow = new EditWindow(SelectedEmployee, _employeeService);
+                bool? result = editWindow.ShowDialog();
+
+                if (result == true)
+                {
+                    RefreshEmployeesCollection();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas edycji pracownika: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -88,35 +94,63 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void LoadData(object parameter)
         {
-            string filePath = GetFilePathFromUser();
-            if (string.IsNullOrEmpty(filePath))
-                return;
+            try
+            {
+                string filePath = GetFilePathFromUser();
+                if (string.IsNullOrEmpty(filePath))
+                    return;
 
-            List<Employee> loadedEmployees = _dataLoader.LoadDataFromCsv(filePath);
-            UpdateEmployeeData(loadedEmployees);
+                List<Employee> loadedEmployees = _dataLoader.LoadDataFromCsv(filePath);
+                UpdateEmployeeData(loadedEmployees);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas ładowania danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void UpdateEmployeeData(List<Employee> employees)
         {
-            _employeeService.RemoveAllEmployees();
-            _employeeService.AddEmployees(employees);
-            RefreshEmployeesCollection();
+            try
+            {
+                _employeeService.RemoveAllEmployees();
+                _employeeService.AddEmployees(employees);
+                RefreshEmployeesCollection();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas aktualizacji danych pracowników: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void RefreshEmployeesCollection()
         {
-            Employees = new ObservableCollection<Employee>(_employeeService.GetAllEmployees());
+            try
+            {
+                Employees = new ObservableCollection<Employee>(_employeeService.GetAllEmployees());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas odświeżania kolekcji pracowników: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SelectDatabase(object parameter)
         {
-            string connectionString = _databaseSelector.GetConnectionString();
-
-            if (!string.IsNullOrEmpty(connectionString))
+            try
             {
-                this._dbContext = new EmployesDbContext(connectionString);
-                this._employeeRepository = new EmployeeRepository(this._dbContext);
-                this._employeeService = new EmployeeService(_employeeRepository);
+                string connectionString = _databaseSelector.GetConnectionString();
+
+                if (!string.IsNullOrEmpty(connectionString))
+                {
+                    _dbContext = new EmployesDbContext(connectionString);
+                    _employeeRepository = new EmployeeRepository(_dbContext);
+                    _employeeService = new EmployeeService(_employeeRepository);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas wyboru bazy danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -129,12 +163,19 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private string GetFilePathFromUser()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
-
-            if (openFileDialog.ShowDialog() == true)
+            try
             {
-                return openFileDialog.FileName;
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    return openFileDialog.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas pobierania ścieżki pliku: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return null;
