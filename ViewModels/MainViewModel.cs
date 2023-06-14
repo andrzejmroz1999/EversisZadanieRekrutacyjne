@@ -24,7 +24,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
     {
         private readonly IDataLoader _dataLoader;
         private readonly IDatabaseSelector _databaseSelector;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
         private readonly EmployesDbContext _dbContext;
 
         private ObservableCollection<Employee> _employees;
@@ -54,29 +54,27 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeRepository employeeRepository, EmployesDbContext dbContext)
+        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeService employeeService, EmployesDbContext dbContext)
         {
             _dataLoader = dataLoader;
             _databaseSelector = databaseSelector;
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
             _dbContext = dbContext;
 
             LoadCommand = new RelayCommand(LoadData);
             SelectDatabaseCommand = new RelayCommand(SelectDatabase);
             EditCommand = new RelayCommand(EditEmployee, CanEditEmployee);
-           
         }
 
         private void EditEmployee(object parameter)
         {
             // Otwórz okno edycji (EditEmployeeWindow) i przekaż wybranego pracownika
-            EditWindow editWindow = new EditWindow(SelectedEmployee, _employeeRepository);
+            EditWindow editWindow = new EditWindow(SelectedEmployee, _employeeService);
             bool? result = editWindow.ShowDialog();
 
             if (result == true)
-            {
-                // Zaktualizuj dane pracownika w widoku modelu
-                // np. wykonaj operacje zapisu zmian do bazy danych
+            {              
+                RefreshEmployeesCollection();
             }
         }
 
@@ -87,25 +85,24 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void LoadData(object parameter)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
+            string filePath = GetFilePathFromUser();
+            if (string.IsNullOrEmpty(filePath))
+                return;
 
-            if (openFileDialog.ShowDialog() == true)
-            {
-                string filePath = openFileDialog.FileName;
-                List<Employee> loadedEmployees = _dataLoader.LoadDataFromCsv(filePath);
+            List<Employee> loadedEmployees = _dataLoader.LoadDataFromCsv(filePath);
+            UpdateEmployeeData(loadedEmployees);
+        }
 
-                // Wyczyść istniejące dane
-                _employeeRepository.RemoveAll();
-                _employeeRepository.Save();
+        private void UpdateEmployeeData(List<Employee> employees)
+        {
+            _employeeService.RemoveAllEmployees();
+            _employeeService.AddEmployees(employees);
+            RefreshEmployeesCollection();
+        }
 
-                // Dodaj nowe dane z pliku CSV do bazy danych
-                _employeeRepository.AddRange(loadedEmployees);
-                _employeeRepository.Save();
-
-                // Pobierz dane z bazy danych i przypisz do ObservableCollection
-                Employees = new ObservableCollection<Employee>(_dbContext.Employees.ToList());
-            }
+        private void RefreshEmployeesCollection()
+        {
+            Employees = new ObservableCollection<Employee>(_employeeService.GetAllEmployees());
         }
 
         private void SelectDatabase(object parameter)
@@ -124,6 +121,19 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private string GetFilePathFromUser()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                return openFileDialog.FileName;
+            }
+
+            return null;
         }
     }
 }

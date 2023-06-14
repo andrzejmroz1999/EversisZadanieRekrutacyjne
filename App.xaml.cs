@@ -3,6 +3,7 @@ using Autofac.Core;
 using EversisZadanieRekrutacyjne.DAL;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Repositories;
+using EversisZadanieRekrutacyjne.Services;
 using EversisZadanieRekrutacyjne.ViewModels;
 using EversisZadanieRekrutacyjne.Views;
 using System;
@@ -42,8 +43,8 @@ namespace EversisZadanieRekrutacyjne
             var dataLoader = new CsvDataLoader();
             var databaseSelector = new SqlDatabaseSelector();
             var employeeRepository = new EmployeeRepository(dbContext);
-
-            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, dbContext);
+            var employeeService = new EmployeeService(employeeRepository);
+            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeService,dbContext);
             var mainWindow = new MainWindow(mainViewModel);
             mainWindow.Show();
         }

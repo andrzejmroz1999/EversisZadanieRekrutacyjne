@@ -18,7 +18,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 {
     public class EditViewModel : INotifyPropertyChanged
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeService _employeeService;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler RequestClose;
@@ -28,12 +28,17 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         public string Surname { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
+            return result == MessageBoxResult.Yes;
+        }
         public ICommand SaveCommand { get; }
 
-        public EditViewModel(Employee employee, IEmployeeRepository employeeRepository)
+        public EditViewModel(Employee employee, IEmployeeService employeeService)
         {
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
 
             InitializeEmployee(employee);
             SaveCommand = new RelayCommand(Save);
@@ -87,8 +92,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void UpdateEmployee(Employee employee)
         {
-            _employeeRepository.Update(employee);
-            _employeeRepository.Save();
+            _employeeService.UpdateEmployee(employee);
         }
 
         private void ShowErrorMessage(string message)

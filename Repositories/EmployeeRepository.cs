@@ -59,6 +59,14 @@ namespace EversisZadanieRekrutacyjne.Repositories
         {
             _dbContext.Set<Employee>().AddRange(employees);
         }
-     
+        public List<Employee> GetAllEmployees()
+        {
+            return _dbContext.Set<Employee>().ToList();
+        }
+
+        public void Remove(Employee employee)
+        {
+            _dbContext.Set<Employee>().Remove(employee);
+        }
     }
 }

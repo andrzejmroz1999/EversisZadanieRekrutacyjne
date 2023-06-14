@@ -22,10 +22,10 @@ namespace EversisZadanieRekrutacyjne.Views
     /// </summary>
     public partial class EditWindow : Window
     {
-        public EditWindow(Employee employee, Interfaces.IEmployeeRepository _employeeRepository)
+        public EditWindow(Employee employee, Interfaces.IEmployeeService _employeeService)
         {
             InitializeComponent();
-            EditViewModel viewModel = new EditViewModel(employee, _employeeRepository);
+            EditViewModel viewModel = new EditViewModel(employee, _employeeService);
             viewModel.RequestClose += (sender, args) => Close();
             this.DataContext = viewModel;
         }
@@ -36,6 +36,11 @@ namespace EversisZadanieRekrutacyjne.Views
             {
                 e.Cancel = true; 
             }
+            else
+            {
+                this.DialogResult = true;
+            }
+           
         }
     }
 }
