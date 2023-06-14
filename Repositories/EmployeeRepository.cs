@@ -12,61 +12,66 @@ namespace EversisZadanieRekrutacyjne.Repositories
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly DbContext _dbContext;
+        private readonly DbSet<Employee> _employees;
 
         public EmployeeRepository(DbContext dbContext)
         {
             _dbContext = dbContext;
+            _employees = _dbContext.Set<Employee>();
         }
 
         public void Add(Employee employee)
         {
-            _dbContext.Set<Employee>().Add(employee);
+            _employees.Add(employee);
             _dbContext.SaveChanges();
         }
 
         public Employee GetById(int id)
         {
-            return _dbContext.Set<Employee>().Find(id);
+            return _employees.Find(id);
         }
 
         public void Update(Employee employee)
         {
-            if (employee != null)
+            var existingEmployee = GetById(employee.Id);
+            if (existingEmployee != null)
             {
-                var existingEmployee = GetById(employee.Id);
-                if (existingEmployee != null)
-                {
-                    _dbContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
-                    _dbContext.SaveChanges();
-                }
+                _dbContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
+                _dbContext.SaveChanges();
             }
         }
 
         public void Delete(Employee employee)
         {
-            _dbContext.Set<Employee>().Remove(employee);
+            _employees.Remove(employee);
             _dbContext.SaveChanges();
         }
+
         public void RemoveAll()
         {
-            _dbContext.Set<Employee>().RemoveRange(_dbContext.Set<Employee>());
+            _employees.RemoveRange(_employees);
+            _dbContext.SaveChanges();
         }
+
         public void Save()
         {
             _dbContext.SaveChanges();
         }
+
         public void AddRange(List<Employee> employees)
         {
-            _dbContext.Set<Employee>().AddRange(employees);
+            _employees.AddRange(employees);
+            _dbContext.SaveChanges();
         }
+
         public List<Employee> GetAllEmployees()
         {
-            return _dbContext.Set<Employee>().ToList();
+            return _employees.ToList();
         }
 
         public void Remove(Employee employee)
         {
-            _dbContext.Set<Employee>().Remove(employee);
+            _employees.Remove(employee);
         }
     }
 }

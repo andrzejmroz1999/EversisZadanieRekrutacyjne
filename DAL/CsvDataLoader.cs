@@ -8,50 +8,30 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace EversisZadanieRekrutacyjne.DAL
 {
     public class CsvDataLoader : IDataLoader
     {
         public List<Employee> LoadDataFromCsv(string filePath)
-   {
-            List<Employee> employees = new List<Employee>();
+        {
+            var employees = new List<Employee>();
 
             try
             {
                 using (var reader = new StreamReader(filePath))
                 {
-                    // Pomijanie nagłówków kolumn
-                    reader.ReadLine();
+                    reader.ReadLine(); // Pomijanie nagłówków kolumn
 
                     while (!reader.EndOfStream)
                     {
                         string line = reader.ReadLine();
-                        string[] data = line.Split(',');
+                        Employee employee = ParseEmployeeFromCsvLine(line);
 
-                        if (data.Length == 5)
+                        if (employee != null)
                         {
-                            if (int.TryParse(data[0], out int id))
-                            {
-                                Employee employee = new Employee
-                                {
-                                    Id = id,
-                                    Name = data[1],
-                                    Surename = data[2],
-                                    Email = data[3],
-                                    Phone = data[4]
-                                };
-
-                                employees.Add(employee);
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Nieprawidłowy format ID w linii: {line}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Nieprawidłowy format danych w linii: {line}");
+                            employees.Add(employee);
                         }
                     }
                 }
@@ -66,6 +46,33 @@ namespace EversisZadanieRekrutacyjne.DAL
             }
 
             return employees;
+        }
+
+        private Employee ParseEmployeeFromCsvLine(string line)
+        {
+            string[] data = line.Split(',');
+
+            int expectedLength = 5; // Oczekiwana długość linii
+            if (data.Length != expectedLength)
+            {
+                MessageBox.Show($"Nieprawidłowy format danych w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
+
+            if (!int.TryParse(data[0], out int id))
+            {
+                MessageBox.Show($"Nieprawidłowy format ID w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
+
+            return new Employee
+            {
+                Id = id,
+                Name = data[1],
+                Surename = data[2],
+                Email = data[3],
+                Phone = data[4]
+            };
         }
     }
 }
