@@ -24,18 +24,20 @@ namespace EversisZadanieRekrutacyjne
     public partial class App : Application
     {
         private EmployesDbContext dbContext;
+        private string ConnectionString = "data source=LAPTOP-PC1SB9ND\\SQLEXPRESS;initial catalog=Employes;integrated security=True;MultipleActiveResultSets=True;";
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
+          
             ConfigureDbContext();
             ConfigureMainWindow();
         }
 
         private void ConfigureDbContext()
         {
-            dbContext = new EmployesDbContext();
+            string connectionString = ConfigurationManager.ConnectionStrings["EmployesConnectionString"].ConnectionString;
+            dbContext = new EmployesDbContext(connectionString);
         }
 
         private void ConfigureMainWindow()
