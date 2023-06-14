@@ -36,15 +36,9 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             {
                 _selectedServer = value;
                 OnPropertyChanged(nameof(SelectedServer));
-
             }
         }
-        public bool CanCloseWindow()
-        {
-            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            return result == MessageBoxResult.Yes;
-        }
         public List<string> ServerInstances
         {
             get { return _serverInstances; }
@@ -129,7 +123,12 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             ConnectCommand = new RelayCommand(Connect);
             CancelCommand = new RelayCommand(Cancel);
         }
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
+            return result == MessageBoxResult.Yes;
+        }
         private void Cancel(object obj)
         {
             SelectedServerInstance = string.Empty;
@@ -142,12 +141,20 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void Connect(object obj)
         {
-            ConnectionString = BuildConnectionString(SelectedServerInstance, SelectedDatabase, Username, Password, WindowsAuthentication);
-            if (!string.IsNullOrEmpty(ConnectionString))
+            try
             {
-                RequestClose?.Invoke(this, EventArgs.Empty);
+                ConnectionString = BuildConnectionString(SelectedServerInstance, SelectedDatabase, Username, Password, WindowsAuthentication);
+                if (!string.IsNullOrEmpty(ConnectionString))
+                {
+                    RequestClose?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Wystąpił błąd podczas nawiązywania połączenia: " + ex.Message);
             }
         }
+
         private string BuildConnectionString(string serverInstance, string databaseName, string username, string password, bool windowsAuthentication)
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
@@ -179,22 +186,37 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 }
                 catch (SqlException ex)
                 {
-                    MessageBox.Show("Błąd połączenia: " + ex.Message, "Błąd");
+                    ShowErrorMessage("Błąd połączenia: " + ex.Message);
                 }
             }
 
             return connectionString;
         }
+
         private void LoadServerInstances(object parameter)
         {
-            // Pobieranie listy dostępnych serwerów MS SQL
-            ServerInstances = GetSqlServerInstances();
+            try
+            {
+                // Pobieranie listy dostępnych serwerów MS SQL
+                ServerInstances = GetSqlServerInstances();
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Wystąpił błąd podczas pobierania listy serwerów: " + ex.Message);
+            }
         }
 
         private void LoadDatabases(object parameter)
         {
-            // Pobieranie listy baz danych dla wybranego serwera MS SQL
-            GetDatabases(SelectedServerInstance, Username, Password);
+            try
+            {
+                // Pobieranie listy baz danych dla wybranego serwera MS SQL
+                GetDatabases(SelectedServerInstance, Username, Password);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Wystąpił błąd podczas pobierania listy baz danych: " + ex.Message);
+            }
         }
 
         #region INotifyPropertyChanged
@@ -212,19 +234,27 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             List<string> instances = new List<string>();
 
-            string ServerName = Environment.MachineName;
-            RegistryView registryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
-            using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
+            try
             {
-                RegistryKey instanceKey = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL", false);
-                if (instanceKey != null)
+                string ServerName = Environment.MachineName;
+                RegistryView registryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
+                using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
                 {
-                    foreach (var instanceName in instanceKey.GetValueNames())
+                    RegistryKey instanceKey = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL", false);
+                    if (instanceKey != null)
                     {
-                        instances.Add(ServerName + "\\" + instanceName);
+                        foreach (var instanceName in instanceKey.GetValueNames())
+                        {
+                            instances.Add(ServerName + "\\" + instanceName);
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd podczas pobierania listy instancji serwera SQL: " + ex.Message);
+            }
+
 
             return instances;
         }
@@ -249,8 +279,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    // Obsłuż ewentualne błędy połączenia
-                    Console.WriteLine($"Error connecting to server: {ex.Message}");
+                    ShowErrorMessage("Błąd podczas pobierania listy baz danych: " + ex.Message);
                 }
             }
 
@@ -274,6 +303,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
 
             return new SqlConnection(builder.ConnectionString);
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            MessageBox.Show(message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

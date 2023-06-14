@@ -28,25 +28,50 @@ namespace EversisZadanieRekrutacyjne
         {
             base.OnStartup(e);
 
-            ConfigureDbContext();
-            ConfigureMainWindow();
+            try
+            {
+                ConfigureDbContext();
+                ConfigureMainWindow();
+            }
+            catch (Exception ex)
+            {
+                // Obsługa ogólnych błędów aplikacji
+                MessageBox.Show("Wystąpił błąd podczas uruchamiania aplikacji: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
         }
 
         private void ConfigureDbContext()
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["EmployesConnectionString"].ConnectionString;
-            dbContext = new EmployesDbContext(connectionString);
+            try
+            {
+                string connectionString = ConfigurationManager.ConnectionStrings["EmployesConnectionString"].ConnectionString;
+                dbContext = new EmployesDbContext(connectionString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas konfigurowania kontekstu bazy danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
         }
 
         private void ConfigureMainWindow()
         {
-            var dataLoader = new CsvDataLoader();
-            var databaseSelector = new SqlDatabaseSelector();
-            var employeeRepository = new EmployeeRepository(dbContext);
-            var employeeService = new EmployeeService(employeeRepository);
-            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, employeeService, dbContext);
-            var mainWindow = new MainWindow(mainViewModel);
-            mainWindow.Show();
+            try
+            {
+                var dataLoader = new CsvDataLoader();
+                var databaseSelector = new SqlDatabaseSelector();
+                var employeeRepository = new EmployeeRepository(dbContext);
+                var employeeService = new EmployeeService(employeeRepository);
+                var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, employeeService, dbContext);
+                var mainWindow = new MainWindow(mainViewModel);
+                mainWindow.Show();
+            }
+            catch (Exception ex)
+            {              
+                MessageBox.Show("Błąd podczas konfigurowania głównego okna: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
         }
     }
 }

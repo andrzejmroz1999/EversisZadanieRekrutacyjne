@@ -38,11 +38,11 @@ namespace EversisZadanieRekrutacyjne.DAL
             }
             catch (IOException ex)
             {
-                Console.WriteLine($"Wystąpił błąd podczas wczytywania pliku CSV: {ex.Message}");
+                MessageBox.Show($"Wystąpił błąd podczas wczytywania pliku CSV: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Wystąpił nieoczekiwany błąd: {ex.Message}");
+                MessageBox.Show($"Wystąpił nieoczekiwany błąd: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return employees;
@@ -50,29 +50,37 @@ namespace EversisZadanieRekrutacyjne.DAL
 
         private Employee ParseEmployeeFromCsvLine(string line)
         {
-            string[] data = line.Split(',');
-
-            int expectedLength = 5; // Oczekiwana długość linii
-            if (data.Length != expectedLength)
+            try
             {
-                MessageBox.Show($"Nieprawidłowy format danych w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                string[] data = line.Split(',');
+
+                int expectedLength = 5; // Oczekiwana długość linii
+                if (data.Length != expectedLength)
+                {
+                    MessageBox.Show($"Nieprawidłowy format danych w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return null;
+                }
+
+                if (!int.TryParse(data[0], out int id))
+                {
+                    MessageBox.Show($"Nieprawidłowy format ID w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return null;
+                }
+
+                return new Employee
+                {
+                    Id = id,
+                    Name = data[1],
+                    Surename = data[2],
+                    Email = data[3],
+                    Phone = data[4]
+                };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Wystąpił błąd podczas przetwarzania linii CSV: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
-
-            if (!int.TryParse(data[0], out int id))
-            {
-                MessageBox.Show($"Nieprawidłowy format ID w linii: {line}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                return null;
-            }
-
-            return new Employee
-            {
-                Id = id,
-                Name = data[1],
-                Surename = data[2],
-                Email = data[3],
-                Phone = data[4]
-            };
         }
     }
 }

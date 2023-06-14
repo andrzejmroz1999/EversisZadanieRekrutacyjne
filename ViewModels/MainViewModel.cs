@@ -58,11 +58,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeRepository employeeRepository, IEmployeeService employeeService, EmployesDbContext dbContext)
         {
-            _dataLoader = dataLoader;
-            _databaseSelector = databaseSelector;
-            _employeeRepository = employeeRepository;
-            _employeeService = employeeService;
-            _dbContext = dbContext;
+            _dataLoader = dataLoader ?? throw new ArgumentNullException(nameof(dataLoader));
+            _databaseSelector = databaseSelector ?? throw new ArgumentNullException(nameof(databaseSelector));
+            _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
+            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
             LoadCommand = new RelayCommand(LoadData);
             SelectDatabaseCommand = new RelayCommand(SelectDatabase);

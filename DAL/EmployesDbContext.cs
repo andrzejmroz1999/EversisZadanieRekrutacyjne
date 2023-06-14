@@ -18,8 +18,15 @@ namespace EversisZadanieRekrutacyjne.DAL
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            // Configure your database mappings here
-            base.OnModelCreating(modelBuilder);
+            try
+            {
+                // Configure your database mappings here
+                base.OnModelCreating(modelBuilder);
+            }
+            catch (Exception ex)
+            {             
+                Console.WriteLine("Błąd konfiguracji modelu bazy danych: " + ex.Message);
+            }
         }
     }
 }

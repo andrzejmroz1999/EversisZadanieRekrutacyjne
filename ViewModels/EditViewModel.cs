@@ -28,12 +28,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         public string Surname { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public bool CanCloseWindow()
-        {
-            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            return result == MessageBoxResult.Yes;
-        }
         public ICommand SaveCommand { get; }
 
         public EditViewModel(Employee employee, IEmployeeService employeeService)
@@ -42,6 +37,12 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
             InitializeEmployee(employee);
             SaveCommand = new RelayCommand(Save);
+        }
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            return result == MessageBoxResult.Yes;
         }
 
         private void InitializeEmployee(Employee employee)
@@ -78,21 +79,35 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void Save(object parameter)
         {
-            if (CanSave(out string error))
+            try
             {
-                var employee = EmployeeFactory.CreateEmployee(Id, Name, Surname, Email, Phone);
-                UpdateEmployee(employee);
-                RequestClose?.Invoke(this, EventArgs.Empty);
+                if (CanSave(out string error))
+                {
+                    var employee = EmployeeFactory.CreateEmployee(Id, Name, Surname, Email, Phone);
+                    UpdateEmployee(employee);
+                    RequestClose?.Invoke(this, EventArgs.Empty);
+                }
+                else
+                {
+                    ShowErrorMessage("Nie można zapisać danych pracownika. " + error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ShowErrorMessage("Nie można zapisać danych pracownika. " + error);
+                ShowErrorMessage("Wystąpił błąd podczas zapisu danych pracownika: " + ex.Message);
             }
         }
 
         private void UpdateEmployee(Employee employee)
         {
-            _employeeService.UpdateEmployee(employee);
+            try
+            {
+                _employeeService.UpdateEmployee(employee);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Błąd podczas aktualizacji pracownika: " + ex.Message);
+            }
         }
 
         private void ShowErrorMessage(string message)

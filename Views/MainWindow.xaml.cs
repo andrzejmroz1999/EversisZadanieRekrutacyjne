@@ -24,9 +24,16 @@ namespace EversisZadanieRekrutacyjne.Views
         private MainViewModel viewModel;
         public MainWindow(MainViewModel viewModel)
         {
-            InitializeComponent();
-            this.viewModel = viewModel;
-            DataContext = viewModel;
+            try
+            {
+                InitializeComponent();
+                this.viewModel = viewModel;
+                DataContext = viewModel;
+            }
+            catch (Exception ex)
+            {            
+                MessageBox.Show("Błąd podczas inicjalizacji głównego okna: " + ex.Message, "Błąd");
+            }
         }
 
 

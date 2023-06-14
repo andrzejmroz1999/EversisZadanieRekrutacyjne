@@ -24,23 +24,36 @@ namespace EversisZadanieRekrutacyjne.Views
     {
         public EditWindow(Employee employee, Interfaces.IEmployeeService _employeeService)
         {
-            InitializeComponent();
-            EditViewModel viewModel = new EditViewModel(employee, _employeeService);
-            viewModel.RequestClose += (sender, args) => Close();
-            this.DataContext = viewModel;
+            try
+            {
+                InitializeComponent();
+                EditViewModel viewModel = new EditViewModel(employee, _employeeService);
+                viewModel.RequestClose += (sender, args) => Close();
+                this.DataContext = viewModel;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas inicjalizacji okna edycji: " + ex.Message, "Błąd");
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!(DataContext as EditViewModel).CanCloseWindow())
+            try
             {
-                e.Cancel = true; 
+                if (!(DataContext as EditViewModel).CanCloseWindow())
+                {
+                    e.Cancel = true;
+                }
+                else
+                {
+                    this.DialogResult = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                this.DialogResult = true;
+                MessageBox.Show("Błąd podczas zamykania okna edycji: " + ex.Message, "Błąd");
             }
-           
         }
     }
 }
