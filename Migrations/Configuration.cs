@@ -5,14 +5,14 @@
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<EversisZadanieRekrutacyjne.DAL.YourDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<EversisZadanieRekrutacyjne.DAL.EmployesDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(EversisZadanieRekrutacyjne.DAL.YourDbContext context)
+        protected override void Seed(EversisZadanieRekrutacyjne.DAL.EmployesDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 

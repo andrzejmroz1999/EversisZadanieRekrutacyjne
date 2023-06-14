@@ -29,13 +29,17 @@
             </Button>
         </StackPanel>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Data}" AutoGenerateColumns="True"
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Employees}" AutoGenerateColumns="False"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10"
                   CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                   AlternatingRowBackground="#EFEFEF" SelectionMode="Single" 
                   SelectionUnit="FullRow">
             <DataGrid.Columns>
-                <!-- Define your columns here -->
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Surname" Binding="{Binding Surename}" />
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
+                <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

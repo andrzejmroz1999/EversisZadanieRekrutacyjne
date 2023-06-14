@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,14 +19,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
     public class MainViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Employee> _employes;
-        public ObservableCollection<Employee> Employes
+        private ObservableCollection<Employee> _employees;
+        public ObservableCollection<Employee> Employees
         {
-            get { return _employes; }
+            get { return _employees; }
             set
             {
-                _employes = value;
-                OnPropertyChanged(nameof(Employes));
+                _employees = value;
+                OnPropertyChanged(nameof(Employees));
             }
         }
 
@@ -34,11 +35,13 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private readonly IDataLoader _dataLoader;
         private readonly IDatabaseSelector _databaseSelector;
+        private readonly EmployesDbContext _dbContext;
 
-        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector)
+        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, EmployesDbContext dbContext)
         {
             _dataLoader = dataLoader;
             _databaseSelector = databaseSelector;
+            _dbContext = dbContext;
 
             LoadCommand = new RelayCommand(LoadData);
             SelectDatabaseCommand = new RelayCommand(SelectDatabase);
@@ -52,9 +55,21 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
-                Employes = new ObservableCollection<Employee>(_dataLoader.LoadDataFromCsv(filePath));
+                List<Employee> loadedEmployees = _dataLoader.LoadDataFromCsv(filePath);
+
+                // Wyczyść istniejące dane
+                _dbContext.Employees.RemoveRange(_dbContext.Employees);
+                _dbContext.SaveChanges();
+
+                // Dodaj nowe dane z pliku CSV do bazy danych
+                _dbContext.Employees.AddRange(loadedEmployees);
+                _dbContext.SaveChanges();
+
+                // Pobierz dane z bazy danych i przypisz do ObservableCollection
+                Employees = new ObservableCollection<Employee>(_dbContext.Employees.ToList());
             }
         }
+
         private void SelectDatabase(object parameter)
         {
             IDatabaseSelector databaseSelector = new SqlDatabaseSelector();
@@ -67,6 +82,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 // np. inicjalizuj DbContext z użyciem connectionString
             }
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)

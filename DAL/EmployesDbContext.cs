@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace EversisZadanieRekrutacyjne.DAL
 {
-    public class YourDbContext : DbContext
+    public class EmployesDbContext : DbContext
     {
-        public YourDbContext() : base("data source=LAPTOP-PC1SB9ND\\SQLEXPRESS;initial catalog=Employes;integrated security=True;MultipleActiveResultSets=True;")
+        public EmployesDbContext() : base("data source=LAPTOP-PC1SB9ND\\SQLEXPRESS;initial catalog=Employes;integrated security=True;MultipleActiveResultSets=True;")
         {
         }
 
-        public DbSet<Employee> DataItems { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

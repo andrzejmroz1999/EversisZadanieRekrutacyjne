@@ -25,9 +25,9 @@ namespace EversisZadanieRekrutacyjne
             // Utworzenie instancji IDataLoader i IDatabaseSelector
             var dataLoader = new CsvDataLoader();
             var databaseSelector = new SqlDatabaseSelector();
-
+            var dbContext = new EmployesDbContext();
             // Utworzenie instancji MainViewModel z wstrzykniętymi zależnościami
-            var viewModel = new MainViewModel(dataLoader, databaseSelector);
+            var viewModel = new MainViewModel(dataLoader, databaseSelector, dbContext);
 
             // Utworzenie instancji MainWindow i przypisanie ViewModel jako DataContext
             var mainWindow = new MainWindow(viewModel);

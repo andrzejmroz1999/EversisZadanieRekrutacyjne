@@ -10,6 +10,6 @@ namespace EversisZadanieRekrutacyjne.Interfaces
 {
     public interface IDataLoader
     {
-        ObservableCollection<Employee> LoadDataFromCsv(string filePath);
+        List<Employee> LoadDataFromCsv(string filePath);
     }
 }
