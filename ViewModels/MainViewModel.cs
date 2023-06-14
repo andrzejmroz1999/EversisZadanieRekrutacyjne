@@ -70,7 +70,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         private void EditEmployee(object parameter)
         {
             // Otwórz okno edycji (EditEmployeeWindow) i przekaż wybranego pracownika
-            EditWindow editWindow = new EditWindow(SelectedEmployee);
+            EditWindow editWindow = new EditWindow(SelectedEmployee, _employeeRepository);
             bool? result = editWindow.ShowDialog();
 
             if (result == true)

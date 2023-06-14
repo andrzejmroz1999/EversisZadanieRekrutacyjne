@@ -31,8 +31,15 @@ namespace EversisZadanieRekrutacyjne.Repositories
 
         public void Update(Employee employee)
         {
-            _dbContext.Entry(employee).State = EntityState.Modified;
-            _dbContext.SaveChanges();
+            if (employee != null)
+            {
+                var existingEmployee = GetById(employee.Id);
+                if (existingEmployee != null)
+                {
+                    _dbContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
+                    _dbContext.SaveChanges();
+                }
+            }
         }
 
         public void Delete(Employee employee)

@@ -1,4 +1,5 @@
 ﻿using EversisZadanieRekrutacyjne.Models;
+using EversisZadanieRekrutacyjne.Repositories;
 using EversisZadanieRekrutacyjne.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -21,10 +22,20 @@ namespace EversisZadanieRekrutacyjne.Views
     /// </summary>
     public partial class EditWindow : Window
     {
-        public EditWindow(Employee employee)
+        public EditWindow(Employee employee, Interfaces.IEmployeeRepository _employeeRepository)
         {
             InitializeComponent();
-            this.DataContext = new EditViewModel(employee);
+            EditViewModel viewModel = new EditViewModel(employee, _employeeRepository);
+            viewModel.RequestClose += (sender, args) => Close();
+            this.DataContext = viewModel;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!(DataContext as EditViewModel).CanCloseWindow())
+            {
+                e.Cancel = true; 
+            }
         }
     }
 }

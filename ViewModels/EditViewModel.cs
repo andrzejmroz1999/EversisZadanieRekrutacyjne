@@ -1,6 +1,8 @@
 ﻿using EversisZadanieRekrutacyjne.Commands;
+using EversisZadanieRekrutacyjne.Helpers;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
+using EversisZadanieRekrutacyjne.Repositories;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,12 +10,30 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace EversisZadanieRekrutacyjne.ViewModels
 {
     public class EditViewModel : INotifyPropertyChanged
     {
+        public event EventHandler RequestClose;
+        private readonly IEmployeeRepository _employeeRepository;
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            return result == MessageBoxResult.Yes;
+        }
+        private bool CanSave()
+        {
+            bool isNameValid = !string.IsNullOrEmpty(Name);
+            bool isSurnameValid = !string.IsNullOrEmpty(Surname);
+            bool isEmailValid = !string.IsNullOrEmpty(Email);
+            bool isPhoneValid = !string.IsNullOrEmpty(Phone);
+
+            return isNameValid && isSurnameValid && isEmailValid && isPhoneValid;
+        }
         private int _id;
         public int Id
         {
@@ -53,7 +73,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public EditViewModel(Employee employee)
+        public EditViewModel(Employee employee, IEmployeeRepository employeeRepository)
         {
             Id = employee.Id;
             Name = employee.Name;
@@ -61,12 +81,22 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             Email = employee.Email;
             Phone = employee.Phone;
 
+            _employeeRepository = employeeRepository;
             SaveCommand = new RelayCommand(Save);
         }
 
         private void Save(object parameter)
         {
-            // Implementacja zapisu zmian w rekordzie
+            if (CanSave())
+            {
+                _employeeRepository.Update(EmployeeFactory.CreateEmployee(Id, Name, Surname, Email, Phone));
+                _employeeRepository.Save();
+                RequestClose?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            { 
+                MessageBox.Show("Nie można zapisać danych pracownika. Należy sprawdzić czy wszystkie pola są wypełnione poprawnie."); 
+            }
         }
 
         protected void SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
