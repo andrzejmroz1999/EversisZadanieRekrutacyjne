@@ -1,4 +1,5 @@
 ﻿using EversisZadanieRekrutacyjne.Commands;
+using EversisZadanieRekrutacyjne.DAL;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
 using Microsoft.Win32;
@@ -17,25 +18,30 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
     public class MainViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Employee> _data;
-        public ObservableCollection<Employee> Data
+        private ObservableCollection<Employee> _employes;
+        public ObservableCollection<Employee> Employes
         {
-            get { return _data; }
+            get { return _employes; }
             set
             {
-                _data = value;
-                OnPropertyChanged(nameof(Data));
+                _employes = value;
+                OnPropertyChanged(nameof(Employes));
             }
         }
 
         public ICommand LoadCommand { get; }
+        public ICommand SelectDatabaseCommand { get; }
 
         private readonly IDataLoader _dataLoader;
+        private readonly IDatabaseSelector _databaseSelector;
 
-        public MainViewModel(IDataLoader dataLoader)
+        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector)
         {
             _dataLoader = dataLoader;
+            _databaseSelector = databaseSelector;
+
             LoadCommand = new RelayCommand(LoadData);
+            SelectDatabaseCommand = new RelayCommand(SelectDatabase);
         }
 
         private void LoadData(object parameter)
@@ -46,10 +52,21 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
-                Data = new ObservableCollection<Employee>(_dataLoader.LoadDataFromCsv(filePath));
+                Employes = new ObservableCollection<Employee>(_dataLoader.LoadDataFromCsv(filePath));
             }
         }
+        private void SelectDatabase(object parameter)
+        {
+            IDatabaseSelector databaseSelector = new SqlDatabaseSelector();
 
+            string connectionString = databaseSelector.GetConnectionString();
+
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                // Wykonaj operacje związane z połączeniem do bazy danych
+                // np. inicjalizuj DbContext z użyciem connectionString
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)

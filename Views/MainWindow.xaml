@@ -20,6 +20,13 @@
                     <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
                 </Button.Effect>
             </Button>
+            <Button Content="Select Database" Command="{Binding SelectDatabaseCommand}"
+                    Background="#4CAF50" Foreground="White"
+                    Padding="10" Margin="0 0 10 0">
+                <Button.Effect>
+                    <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
+                </Button.Effect>
+            </Button>
         </StackPanel>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding Data}" AutoGenerateColumns="True"
