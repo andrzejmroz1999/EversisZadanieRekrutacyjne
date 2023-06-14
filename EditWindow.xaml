@@ -6,7 +6,41 @@
         xmlns:local="clr-namespace:EversisZadanieRekrutacyjne"
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800">
-    <Grid>
-        
+    <Grid Background="#F5F5F5" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="ID:" Foreground="#333" Grid.Column="0" Grid.Row="0" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Id}" IsReadOnly="True" Margin="5" Background="WhiteSmoke"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" Foreground="#333" Margin="5"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" Margin="5" Background="White"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Surname:" Foreground="#333" Margin="5"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Surname}" Margin="5" Background="White"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Email:" Foreground="#333" Margin="5"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Email}" Margin="5" Background="White"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Phone:" Foreground="#333" Margin="5"/>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Phone}" Margin="5" Background="White"/>
+
+        <Button Grid.Row="5" Grid.ColumnSpan="2" Content="Save" Command="{Binding SaveCommand}" HorizontalAlignment="Right"
+                Background="#4CAF50" Foreground="White" Padding="10" Margin="5">
+            <Button.Effect>
+                <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
+            </Button.Effect>
+        </Button>
     </Grid>
 </Window>
