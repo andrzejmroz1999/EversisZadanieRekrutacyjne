@@ -6,7 +6,31 @@
         xmlns:local="clr-namespace:EversisZadanieRekrutacyjne"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <Button Content="Load" Command="{Binding LoadCommand}"
+                    Background="#4CAF50" Foreground="White"
+                    Padding="10" Margin="0 0 10 0">
+                <Button.Effect>
+                    <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
+                </Button.Effect>
+            </Button>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Data}" AutoGenerateColumns="True"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10"
+                  CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                  AlternatingRowBackground="#EFEFEF" SelectionMode="Single" 
+                  SelectionUnit="FullRow">
+            <DataGrid.Columns>
+                <!-- Define your columns here -->
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
+
