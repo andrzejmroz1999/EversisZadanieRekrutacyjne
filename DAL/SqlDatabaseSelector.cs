@@ -13,13 +13,16 @@ namespace EversisZadanieRekrutacyjne.DAL
     {
         public string GetConnectionString()
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
             // Konfiguruj połączenie do bazy danych SQL
             DatabaseConnectionDialog DbConnDialog = new DatabaseConnectionDialog();
-            DbConnDialog.ShowDialog();
-
-            return builder.ConnectionString;
+            if (DbConnDialog.ShowDialog() == true)
+            {
+                return DbConnDialog.ConnectionString;
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

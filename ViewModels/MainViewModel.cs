@@ -3,6 +3,7 @@ using EversisZadanieRekrutacyjne.DAL;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
 using EversisZadanieRekrutacyjne.Repositories;
+using EversisZadanieRekrutacyjne.Services;
 using EversisZadanieRekrutacyjne.Views;
 using Microsoft.Win32;
 using System;
@@ -24,8 +25,9 @@ namespace EversisZadanieRekrutacyjne.ViewModels
     {
         private readonly IDataLoader _dataLoader;
         private readonly IDatabaseSelector _databaseSelector;
-        private readonly IEmployeeService _employeeService;
-        private readonly EmployesDbContext _dbContext;
+        private IEmployeeService _employeeService;
+        private IEmployeeRepository _employeeRepository;
+        private EmployesDbContext _dbContext;
 
         private ObservableCollection<Employee> _employees;
         public ObservableCollection<Employee> Employees
@@ -54,10 +56,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeService employeeService, EmployesDbContext dbContext)
+        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeRepository employeeRepository, IEmployeeService employeeService, EmployesDbContext dbContext)
         {
             _dataLoader = dataLoader;
             _databaseSelector = databaseSelector;
+            _employeeRepository = employeeRepository;
             _employeeService = employeeService;
             _dbContext = dbContext;
 
@@ -73,7 +76,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             bool? result = editWindow.ShowDialog();
 
             if (result == true)
-            {              
+            {
                 RefreshEmployeesCollection();
             }
         }
@@ -111,8 +114,9 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
             if (!string.IsNullOrEmpty(connectionString))
             {
-                // Wykonaj operacje związane z połączeniem do bazy danych
-                // np. inicjalizuj DbContext z użyciem connectionString
+                this._dbContext = new EmployesDbContext(connectionString);
+                this._employeeRepository = new EmployeeRepository(this._dbContext);
+                this._employeeService = new EmployeeService(_employeeRepository);
             }
         }
 

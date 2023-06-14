@@ -44,7 +44,7 @@ namespace EversisZadanieRekrutacyjne
             var databaseSelector = new SqlDatabaseSelector();
             var employeeRepository = new EmployeeRepository(dbContext);
             var employeeService = new EmployeeService(employeeRepository);
-            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeService, dbContext);
+            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, employeeService, dbContext);
             var mainWindow = new MainWindow(mainViewModel);
             mainWindow.Show();
         }

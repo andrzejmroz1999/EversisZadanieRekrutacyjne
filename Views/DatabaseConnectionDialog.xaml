@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EversisZadanieRekrutacyjne.Views"
         mc:Ignorable="d"
         xmlns:helpers="clr-namespace:EversisZadanieRekrutacyjne.Helpers"
-        Title="DatabaseConnectionDialog" Height="450" Width="800">
+        Title="DatabaseConnectionDialog" Height="450" Width="800" Closing="Window_Closing">
 
     <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>

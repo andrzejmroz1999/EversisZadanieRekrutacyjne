@@ -20,6 +20,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 {
     public class DatabaseSelectorViewModel : INotifyPropertyChanged
     {
+        public event EventHandler RequestClose;
         private List<string> _serverInstances;
         private string _selectedServerInstance;
         private string _username;
@@ -35,10 +36,15 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             {
                 _selectedServer = value;
                 OnPropertyChanged(nameof(SelectedServer));
-             
+
             }
         }
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
+            return result == MessageBoxResult.Yes;
+        }
         public List<string> ServerInstances
         {
             get { return _serverInstances; }
@@ -66,7 +72,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             set
             {
                 _selectedServerInstance = value;
-                OnPropertyChanged();            
+                OnPropertyChanged();
             }
         }
 
@@ -114,6 +120,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         public ICommand LoadDatabasesCommand { get; }
         public ICommand ConnectCommand { get; }
         public ICommand CancelCommand { get; }
+        public string ConnectionString { get; private set; }
 
         public DatabaseSelectorViewModel()
         {
@@ -135,7 +142,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private void Connect(object obj)
         {
-            string connectionString = BuildConnectionString(SelectedServerInstance, SelectedDatabase, Username, Password, WindowsAuthentication);
+            ConnectionString = BuildConnectionString(SelectedServerInstance, SelectedDatabase, Username, Password, WindowsAuthentication);
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                RequestClose?.Invoke(this, EventArgs.Empty);
+            }
         }
         private string BuildConnectionString(string serverInstance, string databaseName, string username, string password, bool windowsAuthentication)
         {
