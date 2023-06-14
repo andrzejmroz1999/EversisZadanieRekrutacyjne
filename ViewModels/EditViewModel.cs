@@ -1,5 +1,6 @@
 ﻿using EversisZadanieRekrutacyjne.Commands;
 using EversisZadanieRekrutacyjne.Interfaces;
+using EversisZadanieRekrutacyjne.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,8 +53,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public EditViewModel()
+        public EditViewModel(Employee employee)
         {
+            Id = employee.Id;
+            Name = employee.Name;
+            Surname = employee.Surename;
+            Email = employee.Email;
+            Phone = employee.Phone;
+
             SaveCommand = new RelayCommand(Save);
         }
 

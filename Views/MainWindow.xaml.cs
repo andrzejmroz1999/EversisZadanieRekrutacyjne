@@ -14,17 +14,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace EversisZadanieRekrutacyjne
+namespace EversisZadanieRekrutacyjne.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainViewModel viewModel;
         public MainWindow(MainViewModel viewModel)
         {
             InitializeComponent();
+            this.viewModel = viewModel;
             DataContext = viewModel;
         }
+
+
     }
 }

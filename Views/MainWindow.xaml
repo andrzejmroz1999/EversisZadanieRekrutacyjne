@@ -1,4 +1,4 @@
-﻿<Window x:Class="EversisZadanieRekrutacyjne.MainWindow"
+﻿<Window x:Class="EversisZadanieRekrutacyjne.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -13,23 +13,30 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-            <Button Content="Load" Command="{Binding LoadCommand}"
+            <Button x:Name="LoadButton" Content="Load" Command="{Binding LoadCommand}"
                     Background="#4CAF50" Foreground="White"
                     Padding="10" Margin="0 0 10 0">
                 <Button.Effect>
                     <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
                 </Button.Effect>
             </Button>
-            <Button Content="Select Database" Command="{Binding SelectDatabaseCommand}"
+            <Button x:Name="SelectDatabaseButtton" Content="Select Database" Command="{Binding SelectDatabaseCommand}"
                     Background="#4CAF50" Foreground="White"
                     Padding="10" Margin="0 0 10 0">
+                <Button.Effect>
+                    <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
+                </Button.Effect>
+            </Button>
+            <Button x:Name="EditButton" Content="Edit"  Command="{Binding EditCommand}"
+                    Background="#4CAF50" Foreground="White"
+                    Padding="10">
                 <Button.Effect>
                     <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
                 </Button.Effect>
             </Button>
         </StackPanel>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Employees}" AutoGenerateColumns="False"
+        <DataGrid x:Name="EmployeesDataGrid" Grid.Row="1" ItemsSource="{Binding Employees}" SelectedItem="{Binding SelectedEmployee}" AutoGenerateColumns="False"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10"
                   CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                   AlternatingRowBackground="#EFEFEF" SelectionMode="Single" 

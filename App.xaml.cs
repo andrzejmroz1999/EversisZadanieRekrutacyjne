@@ -1,6 +1,10 @@
-﻿using EversisZadanieRekrutacyjne.DAL;
+﻿using Autofac;
+using Autofac.Core;
+using EversisZadanieRekrutacyjne.DAL;
 using EversisZadanieRekrutacyjne.Interfaces;
+using EversisZadanieRekrutacyjne.Repositories;
 using EversisZadanieRekrutacyjne.ViewModels;
+using EversisZadanieRekrutacyjne.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +13,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
 
 namespace EversisZadanieRekrutacyjne
 {
@@ -17,22 +22,29 @@ namespace EversisZadanieRekrutacyjne
     /// </summary>
     public partial class App : Application
     {
+        private EmployesDbContext dbContext;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            // Utworzenie instancji IDataLoader i IDatabaseSelector
+            ConfigureDbContext();
+            ConfigureMainWindow();
+        }
+
+        private void ConfigureDbContext()
+        {
+            dbContext = new EmployesDbContext();
+        }
+
+        private void ConfigureMainWindow()
+        {
             var dataLoader = new CsvDataLoader();
             var databaseSelector = new SqlDatabaseSelector();
-            var dbContext = new EmployesDbContext();
-            // Utworzenie instancji MainViewModel z wstrzykniętymi zależnościami
-            var viewModel = new MainViewModel(dataLoader, databaseSelector, dbContext);
+            var employeeRepository = new EmployeeRepository(dbContext);
 
-            // Utworzenie instancji MainWindow i przypisanie ViewModel jako DataContext
-            var mainWindow = new MainWindow(viewModel);
-
-            // Uruchomienie aplikacji z MainWindow
+            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, dbContext);
+            var mainWindow = new MainWindow(mainViewModel);
             mainWindow.Show();
         }
     }
