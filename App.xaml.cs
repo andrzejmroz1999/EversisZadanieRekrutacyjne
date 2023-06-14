@@ -24,12 +24,10 @@ namespace EversisZadanieRekrutacyjne
     public partial class App : Application
     {
         private EmployesDbContext dbContext;
-        private string ConnectionString = "data source=LAPTOP-PC1SB9ND\\SQLEXPRESS;initial catalog=Employes;integrated security=True;MultipleActiveResultSets=True;";
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-          
+
             ConfigureDbContext();
             ConfigureMainWindow();
         }
@@ -46,7 +44,7 @@ namespace EversisZadanieRekrutacyjne
             var databaseSelector = new SqlDatabaseSelector();
             var employeeRepository = new EmployeeRepository(dbContext);
             var employeeService = new EmployeeService(employeeRepository);
-            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeService,dbContext);
+            var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeService, dbContext);
             var mainWindow = new MainWindow(mainViewModel);
             mainWindow.Show();
         }

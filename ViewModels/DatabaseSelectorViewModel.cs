@@ -13,6 +13,8 @@ using System.Collections.ObjectModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics.Metrics;
 using Microsoft.Win32;
+using System.Windows;
+using System.Net.NetworkInformation;
 
 namespace EversisZadanieRekrutacyjne.ViewModels
 {
@@ -24,6 +26,8 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         private string _password;
         private string _selectedDatabase;
         private string _selectedServer;
+        private bool _windowsAuthentication;
+
         public string SelectedServer
         {
             get { return _selectedServer; }
@@ -31,11 +35,10 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             {
                 _selectedServer = value;
                 OnPropertyChanged(nameof(SelectedServer));
-
-                // Po zmianie wybranego serwera, pobierz baz danych dla tego serwera
-                GetDatabases(SelectedServer, Username, Password);
+             
             }
         }
+
         public List<string> ServerInstances
         {
             get { return _serverInstances; }
@@ -63,8 +66,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             set
             {
                 _selectedServerInstance = value;
-                OnPropertyChanged();
-                LoadDatabases();
+                OnPropertyChanged();            
             }
         }
 
@@ -77,6 +79,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 OnPropertyChanged();
             }
         }
+
         public string Username
         {
             get { return _username; }
@@ -96,20 +99,88 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 OnPropertyChanged(nameof(Password));
             }
         }
+
+        public bool WindowsAuthentication
+        {
+            get { return _windowsAuthentication; }
+            set
+            {
+                _windowsAuthentication = value;
+                OnPropertyChanged(nameof(WindowsAuthentication));
+            }
+        }
+
         public ICommand LoadServerInstancesCommand { get; }
+        public ICommand LoadDatabasesCommand { get; }
+        public ICommand ConnectCommand { get; }
+        public ICommand CancelCommand { get; }
 
         public DatabaseSelectorViewModel()
         {
             LoadServerInstancesCommand = new RelayCommand(LoadServerInstances);
+            LoadDatabasesCommand = new RelayCommand(LoadDatabases);
+            ConnectCommand = new RelayCommand(Connect);
+            CancelCommand = new RelayCommand(Cancel);
         }
 
+        private void Cancel(object obj)
+        {
+            SelectedServerInstance = string.Empty;
+            Username = string.Empty;
+            Password = string.Empty;
+            SelectedDatabase = string.Empty;
+            SelectedServer = string.Empty;
+            WindowsAuthentication = false;
+        }
+
+        private void Connect(object obj)
+        {
+            string connectionString = BuildConnectionString(SelectedServerInstance, SelectedDatabase, Username, Password, WindowsAuthentication);
+        }
+        private string BuildConnectionString(string serverInstance, string databaseName, string username, string password, bool windowsAuthentication)
+        {
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+            if (windowsAuthentication)
+            {
+                builder.DataSource = serverInstance;
+                builder.IntegratedSecurity = true;
+            }
+            else
+            {
+                builder.DataSource = serverInstance;
+                builder.UserID = username;
+                builder.Password = password;
+            }
+
+            builder.InitialCatalog = databaseName;
+            builder.MultipleActiveResultSets = true;
+
+            string connectionString = builder.ConnectionString;
+
+            // Sprawdzanie połączenia
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    MessageBox.Show("Połączenie udane!", "Sukces");
+                }
+                catch (SqlException ex)
+                {
+                    MessageBox.Show("Błąd połączenia: " + ex.Message, "Błąd");
+                }
+            }
+
+            return connectionString;
+        }
         private void LoadServerInstances(object parameter)
         {
             // Pobieranie listy dostępnych serwerów MS SQL
             ServerInstances = GetSqlServerInstances();
         }
 
-        private void LoadDatabases()
+        private void LoadDatabases(object parameter)
         {
             // Pobieranie listy baz danych dla wybranego serwera MS SQL
             GetDatabases(SelectedServerInstance, Username, Password);
@@ -123,6 +194,9 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
+
         public List<string> GetSqlServerInstances()
         {
             List<string> instances = new List<string>();
@@ -148,11 +222,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             List<string> databases = new List<string>();
 
-            // Implementacja logiki pobierania listy baz danych dla danego serwera
-            // Użyj parametrów serverInstance, username i password do nawiązania połączenia
-
-            // Przykładowa implementacja (zakładając użycie biblioteki System.Data.SqlClient):
-            using (SqlConnection connection = new SqlConnection($"Data Source={serverInstance};User ID={username};Password={password}"))
+            using (SqlConnection connection = GetSqlConnection(serverInstance, username, password))
             {
                 try
                 {
@@ -175,6 +245,24 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
             Databases = new ObservableCollection<string>(databases);
         }
-        #endregion
+
+        private SqlConnection GetSqlConnection(string serverInstance, string username, string password)
+        {
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+            if (WindowsAuthentication)
+            {
+                builder.DataSource = serverInstance;
+                builder.IntegratedSecurity = true;
+            }
+            else
+            {
+                builder.DataSource = serverInstance;
+                builder.UserID = username;
+                builder.Password = password;
+            }
+
+            return new SqlConnection(builder.ConnectionString);
+        }
     }
 }

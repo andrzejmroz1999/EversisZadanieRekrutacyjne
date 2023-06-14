@@ -33,5 +33,11 @@ namespace EversisZadanieRekrutacyjne.Views
             var viewModel = DataContext as DatabaseSelectorViewModel;
             viewModel.LoadServerInstancesCommand.Execute(null);
         }
+
+        private void ComboBox_DropDownOpened_1(object sender, EventArgs e)
+        {
+            var viewModel = DataContext as DatabaseSelectorViewModel;
+            viewModel.LoadDatabasesCommand.Execute(null);
+        }
     }
 }
