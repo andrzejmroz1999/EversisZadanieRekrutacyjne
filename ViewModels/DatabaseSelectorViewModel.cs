@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics.Metrics;
+using Microsoft.Win32;
 
 namespace EversisZadanieRekrutacyjne.ViewModels
 {
@@ -126,20 +127,16 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             List<string> instances = new List<string>();
 
-            string connectionString = "Server=localhost;Database=master;Integrated Security=True;";
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            string ServerName = Environment.MachineName;
+            RegistryView registryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
+            using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
             {
-                connection.Open();
-
-                using (SqlCommand command = new SqlCommand("SELECT name FROM sys.servers WHERE server_id != 0", connection))
+                RegistryKey instanceKey = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL", false);
+                if (instanceKey != null)
                 {
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    foreach (var instanceName in instanceKey.GetValueNames())
                     {
-                        while (reader.Read())
-                        {
-                            string instanceName = reader.GetString(0);
-                            instances.Add(instanceName);
-                        }
+                        instances.Add(ServerName + "\\" + instanceName);
                     }
                 }
             }

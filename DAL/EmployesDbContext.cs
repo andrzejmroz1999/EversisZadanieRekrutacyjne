@@ -10,7 +10,7 @@ namespace EversisZadanieRekrutacyjne.DAL
 {
     public class YourDbContext : DbContext
     {
-        public YourDbContext() : base("YourDbConnection")
+        public YourDbContext() : base("data source=LAPTOP-PC1SB9ND\\SQLEXPRESS;initial catalog=Employes;integrated security=True;MultipleActiveResultSets=True;")
         {
         }
 

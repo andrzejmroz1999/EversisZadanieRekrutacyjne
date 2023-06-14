@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EversisZadanieRekrutacyjne.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,15 @@ namespace EversisZadanieRekrutacyjne.Views
         public DatabaseConnectionDialog()
         {
             InitializeComponent();
+
+            // Ustawienie DataContext na ViewModel
+            DataContext = new DatabaseSelectorViewModel();
+        }
+
+        private void ComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            var viewModel = DataContext as DatabaseSelectorViewModel;
+            viewModel.LoadServerInstancesCommand.Execute(null);
         }
     }
 }
