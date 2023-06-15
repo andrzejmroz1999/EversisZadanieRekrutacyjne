@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace EversisZadanieRekrutacyjne.Helpers
 {
@@ -20,23 +21,33 @@ namespace EversisZadanieRekrutacyjne.Helpers
         {
             try
             {
-                using (SqlConnection connection = new SqlConnection(ConnectionStringEncryptor.DecryptConnectionString(_connectionString)))
-                {
-                    connection.Open();
+              
 
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(ConnectionStringEncryptor.DecryptConnectionString(_connectionString));
+                builder.Remove("initial catalog");
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+                    if (connection.State == System.Data.ConnectionState.Closed)
+                    {
+                        connection.Open();
+                    }
                     string createDatabaseQuery = Properties.Resources.CreateDatabase;
 
                     using (SqlCommand command = new SqlCommand(createDatabaseQuery, connection))
                     {
                         command.ExecuteNonQuery();
                     }
+                    if (connection.State == System.Data.ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
 
-                    Console.WriteLine("Baza danych została utworzona lub już istnieje.");
+                    //Console.WriteLine("Baza danych została utworzona lub już istnieje.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Błąd podczas tworzenia bazy danych: " + ex.Message);
+                MessageBox.Show("Błąd podczas tworzenia bazy danych: " + ex.Message);
             }
         }
     }
