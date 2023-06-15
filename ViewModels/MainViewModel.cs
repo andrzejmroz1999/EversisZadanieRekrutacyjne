@@ -84,7 +84,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas edycji pracownika: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowErrorMessage("Błąd podczas edycji pracownika", ex.Message);
             }
         }
 
@@ -97,7 +97,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             try
             {
-                string filePath = GetFilePathFromUser();
+                string filePath = FileDialogHelper.GetFilePathFromUser();
                 if (string.IsNullOrEmpty(filePath))
                     return;
 
@@ -106,7 +106,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas ładowania danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowErrorMessage("Błąd podczas ładowania danych", ex.Message);
             }
         }
 
@@ -120,7 +120,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas aktualizacji danych pracowników: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowErrorMessage("Błąd podczas aktualizacji danych pracowników", ex.Message);
             }
         }
 
@@ -132,7 +132,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas odświeżania kolekcji pracowników: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowErrorMessage("Błąd podczas odświeżania kolekcji pracowników", ex.Message);
             }
         }
 
@@ -141,46 +141,43 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             try
             {
                 string connectionString = _databaseSelector.GetConnectionString();
-                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(connectionString); //Deszyfrowanie ConnectionString
+               
 
-                if (!string.IsNullOrEmpty(decryptedConnectionString))
+                if (!string.IsNullOrEmpty(connectionString))
                 {
-                    _dbContext = new EmployesDbContext(decryptedConnectionString);
-                    _employeeRepository = new EmployeeRepository(_dbContext);
-                    _employeeService = new EmployeeService(_employeeRepository);
+                    ConfigureEmployeeService(connectionString);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas wyboru bazy danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowErrorMessage("Błąd podczas wyboru bazy danych", ex.Message);
             }
         }
 
+        private void ConfigureEmployeeService(string connectionString)
+        {
+            try
+            {
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(connectionString);
+
+                _dbContext = new EmployesDbContext(decryptedConnectionString);
+                _employeeRepository = new EmployeeRepository(_dbContext);
+                _employeeService = new EmployeeService(_employeeRepository);
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage("Błąd konfiguracji usługi pracowników", ex.Message);
+            }
+        }
+        private void ShowErrorMessage(string title, string message)
+        {
+            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private string GetFilePathFromUser()
-        {
-            try
-            {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
-
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    return openFileDialog.FileName;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Błąd podczas pobierania ścieżki pliku: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            return null;
-        }
+        }      
     }
 }
