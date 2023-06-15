@@ -59,17 +59,5 @@ namespace EversisZadanieRekrutacyjne.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = &apos;Employees&apos;)
-        ///  BEGIN
-        ///     CREATE DATABASE Employees;
-        ///  END.
-        /// </summary>
-        internal static string CreateDatabase {
-            get {
-                return ResourceManager.GetString("CreateDatabase", resourceCulture);
-            }
-        }
     }
 }
