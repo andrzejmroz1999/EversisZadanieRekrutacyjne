@@ -13,7 +13,7 @@ namespace EversisZadanieRekrutacyjne.Interfaces
         void AddEmployees(List<Employee> employees);
         void RemoveEmployee(Employee employee);
         void RemoveAllEmployees();
-        void UpdateEmployee(Employee employee);
+        Task UpdateEmployee(Employee employee);
         Employee GetEmployeeById(int id);
         List<Employee> GetAllEmployees();
     }

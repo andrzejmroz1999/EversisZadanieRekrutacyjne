@@ -1,4 +1,5 @@
-﻿using EversisZadanieRekrutacyjne.Interfaces;
+﻿using EversisZadanieRekrutacyjne.DAL;
+using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void Update(Employee employee)
+        public async Task Update(Employee employee)
         {
             try
             {
@@ -77,12 +78,13 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void RemoveAll()
+        public async Task RemoveAllAsync()
         {
             try
             {
-                _employees.RemoveRange(_employees);
-                _dbContext.SaveChanges();
+              
+                    _employees.RemoveRange(await _employees.ToListAsync());
+                    await SaveAsync();
             }
             catch (Exception ex)
             {
@@ -90,11 +92,11 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
             try
             {
-                _dbContext.SaveChanges();
+             await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

@@ -36,7 +36,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             _employeeService = employeeService;
 
             InitializeEmployee(employee);
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommandAsync(Save);
         }
         public bool CanCloseWindow()
         {
@@ -77,14 +77,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             return isNameValid && isSurnameValid && isEmailValid && isPhoneValid;
         }
 
-        private void Save(object parameter)
+        private async Task Save(object parameter)
         {
             try
             {
                 if (CanSave(out string error))
                 {
                     var employee = EmployeeFactory.CreateEmployee(Id, Name, Surname, Email, Phone);
-                    UpdateEmployee(employee);
+                    await UpdateEmployee(employee);
                     RequestClose?.Invoke(this, EventArgs.Empty);
                 }
                 else
@@ -98,11 +98,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        private void UpdateEmployee(Employee employee)
+        private async Task UpdateEmployee(Employee employee)
         {
             try
             {
-                _employeeService.UpdateEmployee(employee);
+                await _employeeService.UpdateEmployee(employee);
             }
             catch (Exception ex)
             {

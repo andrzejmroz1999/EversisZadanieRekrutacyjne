@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace EversisZadanieRekrutacyjne.Services
 {
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly object _lockObject = new object();
 
         public EmployeeService(IEmployeeRepository employeeRepository)
         {
@@ -20,13 +22,12 @@ namespace EversisZadanieRekrutacyjne.Services
         public void AddEmployees(List<Employee> employees)
         {
             _employeeRepository.AddRange(employees);
-            _employeeRepository.Save();
+            _employeeRepository.SaveAsync();
         }
 
-        public void RemoveAllEmployees()
+        public async void RemoveAllEmployees()
         {
-            _employeeRepository.RemoveAll();
-            _employeeRepository.Save();
+            await _employeeRepository.RemoveAllAsync();
         }
 
         public List<Employee> GetAllEmployees()
@@ -34,16 +35,16 @@ namespace EversisZadanieRekrutacyjne.Services
             return _employeeRepository.GetAllEmployees();
         }
 
-        public void UpdateEmployee(Employee employee)
+        public async Task UpdateEmployee(Employee employee)
         {
-            _employeeRepository.Update(employee);
-            _employeeRepository.Save();
+            await _employeeRepository.Update(employee);
+            await _employeeRepository.SaveAsync();
         }
 
         public void AddEmployee(Employee employee)
         {
             _employeeRepository.Add(employee);
-            _employeeRepository.Save();
+            _employeeRepository.SaveAsync();
         }
 
         public void RemoveEmployee(Employee employee)
@@ -53,7 +54,7 @@ namespace EversisZadanieRekrutacyjne.Services
 
         public Employee GetEmployeeById(int id)
         {
-           return _employeeRepository.GetById(id);
+            return _employeeRepository.GetById(id);
         }
     }
 }
