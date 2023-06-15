@@ -106,13 +106,9 @@ namespace EversisZadanieRekrutacyjne.Repositories
         public void AddRange(List<Employee> employees)
         {
             try
-            {          
-                _dbContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT Employees ON");
+            {                
                 _employees.AddRange(employees);
-                _dbContext.SaveChanges();
-                _dbContext.Database.ExecuteSqlCommand("SET IDENTITY_INSERT Employees OFF");
-                
-                
+                _dbContext.SaveChanges();                                         
             }
             catch (Exception ex)
             {
