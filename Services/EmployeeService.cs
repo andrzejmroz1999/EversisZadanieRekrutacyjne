@@ -28,7 +28,7 @@ namespace EversisZadanieRekrutacyjne.Services
             _employeeRepository.RemoveAll();
             _employeeRepository.Save();
         }
-
+        
         public List<Employee> GetAllEmployees()
         {
             return _employeeRepository.GetAllEmployees();
