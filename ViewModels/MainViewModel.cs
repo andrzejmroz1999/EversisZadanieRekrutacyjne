@@ -1,5 +1,6 @@
 ﻿using EversisZadanieRekrutacyjne.Commands;
 using EversisZadanieRekrutacyjne.DAL;
+using EversisZadanieRekrutacyjne.Helpers;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
 using EversisZadanieRekrutacyjne.Repositories;
@@ -140,10 +141,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             try
             {
                 string connectionString = _databaseSelector.GetConnectionString();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(connectionString); //Deszyfrowanie ConnectionString
 
-                if (!string.IsNullOrEmpty(connectionString))
+                if (!string.IsNullOrEmpty(decryptedConnectionString))
                 {
-                    _dbContext = new EmployesDbContext(connectionString);
+                    _dbContext = new EmployesDbContext(decryptedConnectionString);
                     _employeeRepository = new EmployeeRepository(_dbContext);
                     _employeeService = new EmployeeService(_employeeRepository);
                 }

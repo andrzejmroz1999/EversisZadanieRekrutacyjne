@@ -15,6 +15,7 @@ using System.Diagnostics.Metrics;
 using Microsoft.Win32;
 using System.Windows;
 using System.Net.NetworkInformation;
+using EversisZadanieRekrutacyjne.Helpers;
 
 namespace EversisZadanieRekrutacyjne.ViewModels
 {
@@ -163,7 +164,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             builder.MultipleActiveResultSets = true;
 
             string connectionString = builder.ConnectionString;
-
+           
             // Sprawdzanie połączenia
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -177,8 +178,8 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                     ShowErrorMessage("Błąd połączenia: " + ex.Message);
                 }
             }
-
-            return connectionString;
+            string encryptedConnectionString = ConnectionStringEncryptor.EncryptConnectionString(connectionString); //Szyfrowanie ConnectionString
+            return encryptedConnectionString;
         }
 
         private void LoadServerInstances(object parameter)
