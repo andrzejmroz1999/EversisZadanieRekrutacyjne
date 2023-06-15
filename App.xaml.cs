@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Autofac.Core;
 using EversisZadanieRekrutacyjne.DAL;
+using EversisZadanieRekrutacyjne.Helpers;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Repositories;
 using EversisZadanieRekrutacyjne.Services;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,15 +25,17 @@ namespace EversisZadanieRekrutacyjne
     /// </summary>
     public partial class App : Application
     {
-        private EmployesDbContext dbContext;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             try
             {
-                ConfigureDbContext();
-                ConfigureMainWindow();
+                //Pobranie oraz zaszyfrowanie connection strin z app.config    
+                string connectionString = ConnectionStringEncryptor.EncryptConnectionString(ConfigurationManager.ConnectionStrings["EmployesConnectionString"].ConnectionString);
+
+                CreateDatabase(connectionString);
+                ConfigureMainWindow(connectionString);
             }
             catch (Exception ex)
             {
@@ -41,29 +45,22 @@ namespace EversisZadanieRekrutacyjne
             }
         }
 
-        private void ConfigureDbContext()
+        private void CreateDatabase(string connectionString)
         {
-            try
-            {
-                string connectionString = ConfigurationManager.ConnectionStrings["EmployesConnectionString"].ConnectionString;
-                dbContext = new EmployesDbContext(connectionString);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Błąd podczas konfigurowania kontekstu bazy danych: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                Shutdown();
-            }
+            DatabaseCreator databaseCreator = new DatabaseCreator(connectionString);
+            databaseCreator.CreateDatabase();
         }
 
-        private void ConfigureMainWindow()
+        private void ConfigureMainWindow(string connectionString)
         {
             try
-            {
+            {        
+                           
                 var dataLoader = new CsvDataLoader();
                 var databaseSelector = new SqlDatabaseSelector();
-                var employeeRepository = new EmployeeRepository(dbContext);
+                var employeeRepository = new EmployeeRepository(connectionString);
                 var employeeService = new EmployeeService(employeeRepository);
-                var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, employeeService, dbContext);
+                var mainViewModel = new MainViewModel(dataLoader, databaseSelector, employeeRepository, employeeService);
                 var mainWindow = new MainWindow(mainViewModel);
                 mainWindow.Show();
             }

@@ -9,12 +9,12 @@ namespace EversisZadanieRekrutacyjne.Interfaces
 {
     public interface IEmployeeService
     {
-        void AddEmployee(Employee employee);
-        void AddEmployees(List<Employee> employees);
-        void RemoveEmployee(Employee employee);
-        void RemoveAllEmployees();
-        Task UpdateEmployee(Employee employee);
-        Employee GetEmployeeById(int id);
-        List<Employee> GetAllEmployees();
+        Task AddEmployeeAsync(Employee employee);
+        Task AddEmployeesAsync(List<Employee> employees);
+        Task RemoveEmployeeAsync(Employee employee);
+        Task RemoveAllEmployeesAsync();
+        Task UpdateEmployeeAsync(Employee employee);
+        Task<Employee> GetEmployeeByIdAsync(int id);
+        Task<List<Employee>> GetAllEmployeesAsync();
     }
 }

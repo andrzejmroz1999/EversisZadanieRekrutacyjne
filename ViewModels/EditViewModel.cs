@@ -102,7 +102,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             try
             {
-                await _employeeService.UpdateEmployee(employee);
+                await _employeeService.UpdateEmployeeAsync(employee);
             }
             catch (Exception ex)
             {

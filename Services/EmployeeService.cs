@@ -12,49 +12,48 @@ namespace EversisZadanieRekrutacyjne.Services
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly object _lockObject = new object();
 
         public EmployeeService(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }
 
-        public void AddEmployees(List<Employee> employees)
+        public async Task AddEmployeesAsync(List<Employee> employees)
         {
-            _employeeRepository.AddRange(employees);
-            _employeeRepository.SaveAsync();
+            await _employeeRepository.AddRangeAsync(employees);
+            await _employeeRepository.SaveAsync();
         }
 
-        public async void RemoveAllEmployees()
+        public async Task RemoveAllEmployeesAsync()
         {
             await _employeeRepository.RemoveAllAsync();
         }
 
-        public List<Employee> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployeesAsync()
         {
-            return _employeeRepository.GetAllEmployees();
+            return await _employeeRepository.GetAllEmployeesAsync();
         }
 
-        public async Task UpdateEmployee(Employee employee)
+        public async Task UpdateEmployeeAsync(Employee employee)
         {
-            await _employeeRepository.Update(employee);
+            await _employeeRepository.UpdateAsync(employee);
             await _employeeRepository.SaveAsync();
         }
 
-        public void AddEmployee(Employee employee)
+        public async Task AddEmployeeAsync(Employee employee)
         {
-            _employeeRepository.Add(employee);
-            _employeeRepository.SaveAsync();
+            await _employeeRepository.AddAsync(employee);
+            await _employeeRepository.SaveAsync();
         }
 
-        public void RemoveEmployee(Employee employee)
+        public async Task RemoveEmployeeAsync(Employee employee)
         {
-            _employeeRepository.Remove(employee);
+            await _employeeRepository.RemoveAsync(employee);
         }
 
-        public Employee GetEmployeeById(int id)
+        public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
-            return _employeeRepository.GetById(id);
+            return await _employeeRepository.GetByIdAsync(id);
         }
     }
 }

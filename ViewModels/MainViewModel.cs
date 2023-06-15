@@ -28,7 +28,6 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         private readonly IDatabaseSelector _databaseSelector;
         private IEmployeeService _employeeService;
         private IEmployeeRepository _employeeRepository;
-        private EmployesDbContext _dbContext;
 
         private ObservableCollection<Employee> _employees;
         public ObservableCollection<Employee> Employees
@@ -57,13 +56,12 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeRepository employeeRepository, IEmployeeService employeeService, EmployesDbContext dbContext)
+        public MainViewModel(IDataLoader dataLoader, IDatabaseSelector databaseSelector, IEmployeeRepository employeeRepository, IEmployeeService employeeService)
         {
             _dataLoader = dataLoader ?? throw new ArgumentNullException(nameof(dataLoader));
             _databaseSelector = databaseSelector ?? throw new ArgumentNullException(nameof(databaseSelector));
             _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 
             LoadCommand = new RelayCommand(LoadData);
             SelectDatabaseCommand = new RelayCommand(SelectDatabase);
@@ -114,8 +112,8 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         {
             try
             {
-                _employeeService.RemoveAllEmployees();
-                _employeeService.AddEmployees(employees);
+                _employeeService.RemoveAllEmployeesAsync();
+                _employeeService.AddEmployeesAsync(employees);
                 RefreshEmployeesCollection();
             }
             catch (Exception ex)
@@ -124,11 +122,11 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        private void RefreshEmployeesCollection()
+        private async void RefreshEmployeesCollection()
         {
             try
             {
-                Employees = new ObservableCollection<Employee>(_employeeService.GetAllEmployees());
+                Employees = new ObservableCollection<Employee>(await _employeeService.GetAllEmployeesAsync());
             }
             catch (Exception ex)
             {
@@ -157,11 +155,8 @@ namespace EversisZadanieRekrutacyjne.ViewModels
         private void ConfigureEmployeeService(string connectionString)
         {
             try
-            {
-                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(connectionString);
-
-                _dbContext = new EmployesDbContext(decryptedConnectionString);
-                _employeeRepository = new EmployeeRepository(_dbContext);
+            {            
+                _employeeRepository = new EmployeeRepository(connectionString);
                 _employeeService = new EmployeeService(_employeeRepository);
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using EversisZadanieRekrutacyjne.DAL;
+using EversisZadanieRekrutacyjne.Helpers;
 using EversisZadanieRekrutacyjne.Interfaces;
 using EversisZadanieRekrutacyjne.Models;
 using System;
@@ -13,21 +14,24 @@ namespace EversisZadanieRekrutacyjne.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly DbContext _dbContext;
-        private readonly DbSet<Employee> _employees;
+        private readonly string _ConnectionString;
 
-        public EmployeeRepository(DbContext dbContext)
+        public EmployeeRepository(string connectionString)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _employees = _dbContext.Set<Employee>();
+            _ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        public void Add(Employee employee)
+        public async Task AddAsync(Employee employee)
         {
             try
             {
-                _employees.Add(employee);
-                _dbContext.SaveChanges();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    employees.Add(employee);
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -35,11 +39,16 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public Employee GetById(int id)
+        public async Task<Employee> GetByIdAsync(int id)
         {
             try
             {
-                return _employees.Find(id);
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    return await employees.FindAsync(id);
+                }
             }
             catch (Exception ex)
             {
@@ -48,15 +57,20 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public async Task Update(Employee employee)
+        public async Task UpdateAsync(Employee employee)
         {
             try
             {
-                var existingEmployee = GetById(employee.Id);
-                if (existingEmployee != null)
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
                 {
-                    _dbContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
-                    _dbContext.SaveChanges();
+                    var employees = db.Set<Employee>();
+                    var existingEmployee = await employees.FindAsync(employee.Id);
+                    if (existingEmployee != null)
+                    {
+                        db.Entry(existingEmployee).CurrentValues.SetValues(employee);
+                        await db.SaveChangesAsync();
+                    }
                 }
             }
             catch (Exception ex)
@@ -65,12 +79,17 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void Delete(Employee employee)
+        public async Task DeleteAsync(Employee employee)
         {
             try
             {
-                _employees.Remove(employee);
-                _dbContext.SaveChanges();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    employees.Remove(employee);
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -82,9 +101,13 @@ namespace EversisZadanieRekrutacyjne.Repositories
         {
             try
             {
-              
-                    _employees.RemoveRange(await _employees.ToListAsync());
-                    await SaveAsync();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    employees.RemoveRange(employees);
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -96,7 +119,11 @@ namespace EversisZadanieRekrutacyjne.Repositories
         {
             try
             {
-             await _dbContext.SaveChangesAsync();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -104,12 +131,17 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void AddRange(List<Employee> employees)
+        public async Task AddRangeAsync(List<Employee> employees)
         {
             try
             {
-                _employees.AddRange(employees);
-                _dbContext.SaveChanges();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employeesDbSet = db.Set<Employee>();
+                    employeesDbSet.AddRange(employees);
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -117,11 +149,16 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public List<Employee> GetAllEmployees()
+        public async Task<List<Employee>> GetAllEmployeesAsync()
         {
             try
             {
-                return _employees.ToList();
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    return await employees.ToListAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -130,11 +167,17 @@ namespace EversisZadanieRekrutacyjne.Repositories
             }
         }
 
-        public void Remove(Employee employee)
+        public async Task RemoveAsync(Employee employee)
         {
             try
             {
-                _employees.Remove(employee);
+                string decryptedConnectionString = ConnectionStringEncryptor.DecryptConnectionString(_ConnectionString);
+                using (var db = new EmployesDbContext(decryptedConnectionString))
+                {
+                    var employees = db.Set<Employee>();
+                    employees.Remove(employee);
+                    await db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

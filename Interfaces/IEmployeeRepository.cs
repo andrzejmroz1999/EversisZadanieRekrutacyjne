@@ -7,14 +7,14 @@ namespace EversisZadanieRekrutacyjne.Interfaces
 {
     public interface IEmployeeRepository
     {
-        void Add(Employee employee);
-        Employee GetById(int id);
-        Task Update(Employee employee);
-        void Delete(Employee employee);
+        Task AddAsync(Employee employee);
+        Task<Employee> GetByIdAsync(int id);
+        Task UpdateAsync(Employee employee);
+        Task DeleteAsync(Employee employee);
         Task RemoveAllAsync();
         Task SaveAsync();
-        void AddRange(List<Employee> employees);
-        List<Employee> GetAllEmployees();
-        void Remove(Employee employee);
+        Task AddRangeAsync(List<Employee> employees);
+        Task<List<Employee>> GetAllEmployeesAsync();
+        Task RemoveAsync(Employee employee);
     }
 }
