@@ -1,7 +1,9 @@
 ﻿using EversisZadanieRekrutacyjne.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +22,11 @@ namespace EversisZadanieRekrutacyjne.DAL
         {
             try
             {
-                // Configure your database mappings here
+                // Configure your database mappings here                      
                 base.OnModelCreating(modelBuilder);
             }
             catch (Exception ex)
-            {             
+            {
                 Console.WriteLine("Błąd konfiguracji modelu bazy danych: " + ex.Message);
             }
         }
