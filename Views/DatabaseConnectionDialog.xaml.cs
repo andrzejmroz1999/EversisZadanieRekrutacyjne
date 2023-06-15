@@ -31,33 +31,7 @@ namespace EversisZadanieRekrutacyjne.Views
             DataContext = viewModel;
         }
 
-        public string ConnectionString { get; private set; }
-
-        private void ComboBox_DropDownOpened(object sender, EventArgs e)
-        {
-            try
-            {
-                var viewModel = DataContext as DatabaseSelectorViewModel;
-                viewModel.LoadServerInstancesCommand.Execute(null);
-            }
-            catch (Exception ex)
-            {            
-                MessageBox.Show("Błąd podczas ładowania instancji serwera SQL: " + ex.Message, "Błąd");
-            }
-        }
-
-        private void ComboBox_DropDownOpened_1(object sender, EventArgs e)
-        {
-            try
-            {
-                var viewModel = DataContext as DatabaseSelectorViewModel;
-                viewModel.LoadDatabasesCommand.Execute(null);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Błąd podczas ładowania baz danych: " + ex.Message, "Błąd");
-            }
-        }
+        public string ConnectionString { get; private set; }    
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -77,6 +51,32 @@ namespace EversisZadanieRekrutacyjne.Views
             catch (Exception ex)
             {
                 MessageBox.Show("Błąd podczas zamykania okna: " + ex.Message, "Błąd");
+            }
+        }
+
+        private void ServerCombobox_DropDownOpened(object sender, EventArgs e)
+        {
+            try
+            {
+                var viewModel = DataContext as DatabaseSelectorViewModel;
+                viewModel.LoadServerInstancesCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas ładowania instancji serwera SQL: " + ex.Message, "Błąd");
+            }
+        }
+
+        private void DatabaseCombobox_DropDownOpened(object sender, EventArgs e)
+        {
+            try
+            {
+                var viewModel = DataContext as DatabaseSelectorViewModel;
+                viewModel.LoadDatabasesCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas ładowania baz danych: " + ex.Message, "Błąd");
             }
         }
     }

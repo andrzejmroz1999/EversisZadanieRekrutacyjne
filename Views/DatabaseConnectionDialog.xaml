@@ -24,16 +24,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Content="Server:" Foreground="#333"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ServerInstances}"
+        <Label x:Name="LblServer" Grid.Row="0" Grid.Column="0" Content="Server:" Foreground="#333"/>
+        <ComboBox x:Name="ServerCombobox" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ServerInstances}"
                   SelectedItem="{Binding SelectedServerInstance}" 
-                  Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1" DropDownOpened="ComboBox_DropDownOpened"/>
+                  Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1" DropDownOpened="ServerCombobox_DropDownOpened"/>
 
-        <Label Grid.Row="1" Grid.Column="0" Content="Username:" Foreground="#333"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Username}"
+        <Label x:Name="LblUserName" Grid.Row="1" Grid.Column="0" Content="Username:" Foreground="#333"/>
+        <TextBox x:Name="UserNameTextbox" Grid.Row="1" Grid.Column="1" Text="{Binding Username}"
                  Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1"/>
 
-        <Label Grid.Row="2" Grid.Column="0" Content="Password:" Foreground="#333"/>
+        <Label x:Name="LblPassword" Grid.Row="2" Grid.Column="0" Content="Password:" Foreground="#333"/>
         <PasswordBox x:Name="passwordBox" Grid.Row="2" Grid.Column="1"  
                      Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1"
                      helpers:PasswordBoxHelper.Password="{Binding Password, Mode=TwoWay}">
@@ -42,7 +42,7 @@
             </PasswordBox.Effect>
         </PasswordBox>
 
-        <CheckBox Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Content="Windows Authentication"
+        <CheckBox x:Name="WindowsAuthenticationCheckbox" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Content="Windows Authentication"
                   IsChecked="{Binding WindowsAuthentication}"
                   Margin="10">
             <CheckBox.Effect>
@@ -50,27 +50,18 @@
             </CheckBox.Effect>
         </CheckBox>
 
-        <Label Grid.Row="4" Grid.Column="0" Content="Database:" Foreground="#333"/>
-        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding Databases}"
+        <Label x:Name="LblDatabase" Grid.Row="4" Grid.Column="0" Content="Database:" Foreground="#333"/>
+        <ComboBox x:Name="DatabaseCombobox" Grid.Row="4" Grid.Column="1" ItemsSource="{Binding Databases}"
                   SelectedItem="{Binding SelectedDatabase}"
-                  Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1" DropDownOpened="ComboBox_DropDownOpened_1">
+                  Margin="5" Padding="5" BorderBrush="#333" BorderThickness="1" DropDownOpened="DatabaseCombobox_DropDownOpened">
             <ComboBox.Effect>
                 <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
             </ComboBox.Effect>
         </ComboBox>
         
-        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Connect"
+        <Button x:Name="ConnectButton" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="Connect"
                 Command="{Binding ConnectCommand}"
                 Background="#4CAF50" Foreground="White"
-                Margin="10" Padding="10">
-            <Button.Effect>
-                <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
-            </Button.Effect>
-        </Button>
-
-        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Cancel"
-                Command="{Binding CancelCommand}"
-                Background="#FF4081" Foreground="White"
                 Margin="10" Padding="10">
             <Button.Effect>
                 <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>

@@ -22,6 +22,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
     {
         public event EventHandler RequestClose;
         private List<string> _serverInstances;
+
         private string _selectedServerInstance;
         private string _username;
         private string _password;
@@ -109,11 +110,15 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 OnPropertyChanged(nameof(WindowsAuthentication));
             }
         }
+        public bool CanCloseWindow()
+        {
+            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
+            return result == MessageBoxResult.Yes;
+        }
         public ICommand LoadServerInstancesCommand { get; }
         public ICommand LoadDatabasesCommand { get; }
         public ICommand ConnectCommand { get; }
-        public ICommand CancelCommand { get; }
         public string ConnectionString { get; private set; }
 
         public DatabaseSelectorViewModel()
@@ -121,24 +126,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             LoadServerInstancesCommand = new RelayCommand(LoadServerInstances);
             LoadDatabasesCommand = new RelayCommand(LoadDatabases);
             ConnectCommand = new RelayCommand(Connect);
-            CancelCommand = new RelayCommand(Cancel);
-        }
-        public bool CanCloseWindow()
-        {
-            MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            return result == MessageBoxResult.Yes;
-        }
-        private void Cancel(object obj)
-        {
-            SelectedServerInstance = string.Empty;
-            Username = string.Empty;
-            Password = string.Empty;
-            SelectedDatabase = string.Empty;
-            SelectedServer = string.Empty;
-            WindowsAuthentication = false;
-        }
-
+        }   
         private void Connect(object obj)
         {
             try

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EversisZadanieRekrutacyjne"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Main window" Height="450" Width="800">
     <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,7 +20,7 @@
                     <DropShadowEffect Color="#333" BlurRadius="5" Opacity="0.5" Direction="315" ShadowDepth="2"/>
                 </Button.Effect>
             </Button>
-            <Button x:Name="SelectDatabaseButtton" Content="Select Database" Command="{Binding SelectDatabaseCommand}"
+            <Button x:Name="SelectDatabaseButtton" Content="Connect to the database" Command="{Binding SelectDatabaseCommand}"
                     Background="#4CAF50" Foreground="White"
                     Padding="10" Margin="0 0 10 0">
                 <Button.Effect>
