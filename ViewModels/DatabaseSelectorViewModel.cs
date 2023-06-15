@@ -16,17 +16,22 @@ using Microsoft.Win32;
 using System.Windows;
 using System.Net.NetworkInformation;
 using EversisZadanieRekrutacyjne.Helpers;
+using EversisZadanieRekrutacyjne.DataProviders;
 
 namespace EversisZadanieRekrutacyjne.ViewModels
 {
     public class DatabaseSelectorViewModel : INotifyPropertyChanged
     {
         public event EventHandler RequestClose;
-        private List<string> _serverInstances;
 
+        private ServerInstancesProvider _serverInstancesProvider;
+        private DatabasesProvider _databasesProvider;
+
+        private List<string> _serverInstances;
         private string _selectedServerInstance;
         private string _username;
         private string _password;
+        private ObservableCollection<string> _databases;
         private string _selectedDatabase;
         private string _selectedServer;
         private bool _windowsAuthentication;
@@ -51,7 +56,6 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             }
         }
 
-        private ObservableCollection<string> _databases;
         public ObservableCollection<string> Databases
         {
             get { return _databases; }
@@ -111,12 +115,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
                 OnPropertyChanged(nameof(WindowsAuthentication));
             }
         }
+
         public bool CanCloseWindow()
         {
             MessageBoxResult result = MessageBox.Show("Czy na pewno chcesz zamknąć okno?", "Zamknij", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             return result == MessageBoxResult.Yes;
         }
+
         public ICommand LoadServerInstancesCommand { get; }
         public ICommand LoadDatabasesCommand { get; }
         public ICommand ConnectCommand { get; }
@@ -124,10 +130,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         public DatabaseSelectorViewModel()
         {
+            _serverInstancesProvider = new ServerInstancesProvider();
+            _databasesProvider = new DatabasesProvider();
+
             LoadServerInstancesCommand = new RelayCommand(LoadServerInstances);
             LoadDatabasesCommand = new RelayCommand(LoadDatabases);
             ConnectCommand = new RelayCommand(Connect);
-        }   
+        }
+
         private void Connect(object obj)
         {
             try
@@ -146,40 +156,8 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         private string BuildConnectionString(string serverInstance, string databaseName, string username, string password, bool windowsAuthentication)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-            if (windowsAuthentication)
-            {
-                builder.DataSource = serverInstance;
-                builder.IntegratedSecurity = true;
-            }
-            else
-            {
-                builder.DataSource = serverInstance;
-                builder.UserID = username;
-                builder.Password = password;
-            }
-
-            builder.InitialCatalog = databaseName;
-            builder.MultipleActiveResultSets = true;
-
-            string connectionString = builder.ConnectionString;
-           
-            // Sprawdzanie połączenia
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    MessageBox.Show("Połączenie udane!", "Sukces");
-                }
-                catch (SqlException ex)
-                {
-                    ShowErrorMessage("Błąd połączenia: " + ex.Message);
-                }
-            }
-            string encryptedConnectionString = ConnectionStringEncryptor.EncryptConnectionString(connectionString); //Szyfrowanie ConnectionString
-            return encryptedConnectionString;
+            ConnectionStringFactory factory = new ConnectionStringFactory();
+            return factory.BuildConnectionString(serverInstance, databaseName, username, password, windowsAuthentication);
         }
 
         private void LoadServerInstances(object parameter)
@@ -187,7 +165,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             try
             {
                 // Pobieranie listy dostępnych serwerów MS SQL
-                ServerInstances = GetSqlServerInstances();
+                ServerInstances = _serverInstancesProvider.GetSqlServerInstances();
             }
             catch (Exception ex)
             {
@@ -200,7 +178,7 @@ namespace EversisZadanieRekrutacyjne.ViewModels
             try
             {
                 // Pobieranie listy baz danych dla wybranego serwera MS SQL
-                GetDatabases(SelectedServerInstance, Username, Password);
+                Databases = _databasesProvider.GetDatabases(SelectedServerInstance, Username, Password);
             }
             catch (Exception ex)
             {
@@ -219,84 +197,14 @@ namespace EversisZadanieRekrutacyjne.ViewModels
 
         #endregion
 
-        public List<string> GetSqlServerInstances()
-        {
-            List<string> instances = new List<string>();
-
-            try
-            {
-                string ServerName = Environment.MachineName;
-                RegistryView registryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
-                using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
-                {
-                    RegistryKey instanceKey = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL", false);
-                    if (instanceKey != null)
-                    {
-                        foreach (var instanceName in instanceKey.GetValueNames())
-                        {
-                            instances.Add(ServerName + "\\" + instanceName);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Błąd podczas pobierania listy instancji serwera SQL: " + ex.Message);
-            }
-
-
-            return instances;
-        }
-
-        private void GetDatabases(string serverInstance, string username, string password)
-        {
-            List<string> databases = new List<string>();
-
-            using (SqlConnection connection = GetSqlConnection(serverInstance, username, password))
-            {
-                try
-                {
-                    connection.Open();
-
-                    // Pobierz listę baz danych
-                    DataTable databasesSchema = connection.GetSchema("Databases");
-                    foreach (DataRow row in databasesSchema.Rows)
-                    {
-                        string databaseName = row.Field<string>("database_name");
-                        databases.Add(databaseName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ShowErrorMessage("Błąd podczas pobierania listy baz danych: " + ex.Message);
-                }
-            }
-
-            Databases = new ObservableCollection<string>(databases);
-        }
-
-        private SqlConnection GetSqlConnection(string serverInstance, string username, string password)
-        {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-            if (WindowsAuthentication)
-            {
-                builder.DataSource = serverInstance;
-                builder.IntegratedSecurity = true;
-            }
-            else
-            {
-                builder.DataSource = serverInstance;
-                builder.UserID = username;
-                builder.Password = password;
-            }
-
-            return new SqlConnection(builder.ConnectionString);
-        }
-
         private void ShowErrorMessage(string message)
         {
             MessageBox.Show(message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
+
+
+
+
+
